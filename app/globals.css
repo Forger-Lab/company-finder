@@ -273,3 +273,100 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ─── Landing-page animations ──────────────────────────────────────────── */
+
+@keyframes blob-float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -40px) scale(1.08);
+  }
+  66% {
+    transform: translate(-25px, 25px) scale(0.95);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.95); opacity: 0.7; }
+  70%  { transform: scale(1.4);  opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+.animate-blob {
+  animation: blob-float 14s ease-in-out infinite;
+}
+.animate-blob-slow {
+  animation: blob-float 22s ease-in-out infinite;
+}
+.animate-ticker {
+  animation: ticker 35s linear infinite;
+}
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.fade-up-1 { animation: fade-up 0.7s ease-out 0.05s both; }
+.fade-up-2 { animation: fade-up 0.7s ease-out 0.15s both; }
+.fade-up-3 { animation: fade-up 0.7s ease-out 0.25s both; }
+.fade-up-4 { animation: fade-up 0.7s ease-out 0.35s both; }
+.fade-up-5 { animation: fade-up 0.7s ease-out 0.45s both; }
+
+.bg-shimmer {
+  background: linear-gradient(
+    110deg,
+    rgba(255,255,255,0) 30%,
+    rgba(255,255,255,0.4) 50%,
+    rgba(255,255,255,0) 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3.5s linear infinite;
+}
+
+/* Scroll-triggered fade-up using the modern view() timeline.
+   Progressively enhances browsers that support it; older browsers
+   still see fully rendered content. */
+@supports (animation-timeline: view()) {
+  .reveal-on-scroll {
+    animation: fade-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 30%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blob,
+  .animate-blob-slow,
+  .animate-ticker,
+  .animate-pulse-ring,
+  .bg-shimmer,
+  .fade-up-1,
+  .fade-up-2,
+  .fade-up-3,
+  .fade-up-4,
+  .fade-up-5,
+  .reveal-on-scroll {
+    animation: none !important;
+  }
+}

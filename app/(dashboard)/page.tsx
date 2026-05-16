@@ -1,130 +1,827 @@
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CreditCard, Database } from 'lucide-react';
-import { Terminal } from './terminal';
+import {
+  ArrowRight,
+  ShieldCheck,
+  Sparkles,
+  Search,
+  Zap,
+  Bot,
+  Building2,
+  Clock,
+  PoundSterling,
+  XCircle,
+  CheckCircle2,
+  AlertTriangle,
+  ChevronDown,
+  FileText,
+  Database,
+  Gauge,
+} from 'lucide-react';
+
+// ────────────────────────────────────────────────────────────────────────
+// Page-level structured data for SEO.
+// FAQPage + WebApplication schemas help Google surface rich results
+// (accordion in search, app card with rating slot) and reinforce the
+// page's topical focus.
+// ────────────────────────────────────────────────────────────────────────
+
+const FAQ_ITEMS: Array<{ q: string; a: string }> = [
+  {
+    q: 'How does Companies House decide if two company names are the "same as"?',
+    a: 'Schedule 3 of The Company, Limited Liability Partnership and Business (Names and Trading Disclosures) Regulations 2015 lists the disregarded words (Limited, Ltd, Company, UK, Great Britain, etc.), character equivalents (& = and, + = plus, 4 = four/for, etc.) and punctuation/spacing rules that two names must differ by to be considered distinct. We implement those rules end-to-end so the verdict you see here matches what Companies House would decide.',
+  },
+  {
+    q: 'Is this an official Companies House tool?',
+    a: 'No. We are an independent service that uses the public Companies House API to fetch live data, then applies the official "same as" ruleset locally. We always link out to the official Companies House page for each match so you can verify yourself.',
+  },
+  {
+    q: 'What does it cost to check a name?',
+    a: 'Searching is free. Create an account to save searches, get AI-generated alternatives, and bulk-check shortlists.',
+  },
+  {
+    q: 'Why did a name come back available here but get rejected by Companies House?',
+    a: 'The "same as" rule is one of several name checks Companies House performs. They also reject names containing sensitive words (e.g. "Bank", "Royal"), names that are "too like" an existing name in their reviewer\'s judgement, and trademark conflicts. We check the algorithmic same-as rule precisely; the subjective "too like" check is not algorithmic and you should always run a final check on the official tool before incorporating.',
+  },
+  {
+    q: 'Does a dissolved company name become available again?',
+    a: 'Sometimes — Companies House keeps a name reserved for a period after dissolution. We flag dissolved matches separately with an amber "you may still be able to register this name" hint, but you should confirm with Companies House before incorporating.',
+  },
+  {
+    q: 'Can I check several names at once?',
+    a: 'Yes. The "I\'m looking for a name" tab lets you describe your business in plain English, get 10 AI-generated name ideas, tick the ones you like, and bulk-check their availability in one go.',
+  },
+  {
+    q: 'How fresh is the company data?',
+    a: 'Every search hits the live Companies House Advanced Search and Basic Search APIs in real time, so you see exactly the same dataset the official register would show you — including active, dissolved, in-liquidation, in-administration, and removed companies.',
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ_ITEMS.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+};
+
+const appJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'DoesThisCompanyExist.com',
+  url: 'https://doesthiscompanyexist.com',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Any',
+  description:
+    'UK company name availability checker. Validates against Companies House Schedule 3 "same as" rules in real time and suggests AI-powered alternatives when your name is taken.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+  audience: {
+    '@type': 'Audience',
+    audienceType: 'Founders and entrepreneurs incorporating UK limited companies',
+  },
+};
 
 export default function HomePage() {
   return (
     <main>
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-            <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-              <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
-                Build Your SaaS
-                <span className="block text-orange-500">Faster Than Ever</span>
-              </h1>
-              <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                Launch your SaaS product in record time with our powerful,
-                ready-to-use template. Packed with modern technologies and
-                essential integrations.
-              </p>
-              <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-                <a
-                  href="https://vercel.com/templates/next.js/next-js-saas-starter"
-                  target="_blank"
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }}
+      />
+
+      <Hero />
+      <TrustBar />
+      <PainSection />
+      <FeaturesSection />
+      <HowItWorks />
+      <ComparisonSection />
+      <DemoTeaser />
+      <FAQSection />
+      <FinalCTA />
+      <Footer />
+    </main>
+  );
+}
+
+// ─── Hero ────────────────────────────────────────────────────────────────
+
+function Hero() {
+  return (
+    <section className="relative overflow-hidden bg-gradient-to-b from-orange-50/60 via-white to-white">
+      {/* animated background blobs */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-32 -left-24 h-96 w-96 rounded-full bg-orange-200/40 blur-3xl animate-blob" />
+        <div className="absolute top-40 -right-20 h-96 w-96 rounded-full bg-amber-200/40 blur-3xl animate-blob-slow" />
+        <div className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-rose-200/30 blur-3xl animate-blob" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 sm:pt-28 sm:pb-32">
+        <div className="grid lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-7">
+            <div className="fade-up-1 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-orange-200 text-sm font-semibold text-orange-700 shadow-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-orange-400 animate-pulse-ring" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
+              </span>
+              Live Companies House data · 5.6m+ UK records
+            </div>
+
+            <h1 className="fade-up-2 mt-6 text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900 leading-[1.05]">
+              Don't pay{' '}
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-orange-500 via-rose-500 to-amber-500 bg-clip-text text-transparent">
+                  £50
+                </span>
+              </span>{' '}
+              to find out
+              <br />
+              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                your company name is taken.
+              </span>
+            </h1>
+
+            <p className="fade-up-3 mt-6 text-xl text-gray-600 max-w-xl leading-relaxed">
+              Check any UK company name against the live{' '}
+              <strong className="text-gray-900">Companies House</strong> register
+              in under a second — using the official Schedule 3 "same as" rules.
+              If it's taken, our AI brainstorms registrable alternatives on the
+              spot.
+            </p>
+
+            <div className="fade-up-4 mt-8 flex flex-col sm:flex-row gap-3">
+              <Link href="/sign-up">
+                <Button
+                  size="lg"
+                  className="text-base rounded-full bg-orange-500 hover:bg-orange-600 px-8 py-6 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-all hover:-translate-y-0.5"
                 >
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="text-lg rounded-full"
-                  >
-                    Deploy your own
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </a>
-              </div>
-            </div>
-            <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-              <Terminal />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-white w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-3 lg:gap-8">
-            <div>
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
-                <svg viewBox="0 0 24 24" className="h-6 w-6">
-                  <path
-                    fill="currentColor"
-                    d="M14.23 12.004a2.236 2.236 0 0 1-2.235 2.236 2.236 2.236 0 0 1-2.236-2.236 2.236 2.236 0 0 1 2.235-2.236 2.236 2.236 0 0 1 2.236 2.236zm2.648-10.69c-1.346 0-3.107.96-4.888 2.622-1.78-1.653-3.542-2.602-4.887-2.602-.41 0-.783.093-1.106.278-1.375.793-1.683 3.264-.973 6.365C1.98 8.917 0 10.42 0 12.004c0 1.59 1.99 3.097 5.043 4.03-.704 3.113-.39 5.588.988 6.38.32.187.69.275 1.102.275 1.345 0 3.107-.96 4.888-2.624 1.78 1.654 3.542 2.603 4.887 2.603.41 0 .783-.09 1.106-.275 1.374-.792 1.683-3.263.973-6.365C22.02 15.096 24 13.59 24 12.004c0-1.59-1.99-3.097-5.043-4.032.704-3.11.39-5.587-.988-6.38-.318-.184-.688-.277-1.092-.278zm-.005 1.09v.006c.225 0 .406.044.558.127.666.382.955 1.835.73 3.704-.054.46-.142.945-.25 1.44-.96-.236-2.006-.417-3.107-.534-.66-.905-1.345-1.727-2.035-2.447 1.592-1.48 3.087-2.292 4.105-2.295zm-9.77.02c1.012 0 2.514.808 4.11 2.28-.686.72-1.37 1.537-2.02 2.442-1.107.117-2.154.298-3.113.538-.112-.49-.195-.964-.254-1.42-.23-1.868.054-3.32.714-3.707.19-.09.4-.127.563-.132zm4.882 3.05c.455.468.91.992 1.36 1.564-.44-.02-.89-.034-1.345-.034-.46 0-.915.01-1.36.034.44-.572.895-1.096 1.345-1.565zM12 8.1c.74 0 1.477.034 2.202.093.406.582.802 1.203 1.183 1.86.372.64.71 1.29 1.018 1.946-.308.655-.646 1.31-1.013 1.95-.38.66-.773 1.288-1.18 1.87-.728.063-1.466.098-2.21.098-.74 0-1.477-.035-2.202-.093-.406-.582-.802-1.204-1.183-1.86-.372-.64-.71-1.29-1.018-1.946.303-.657.646-1.313 1.013-1.954.38-.66.773-1.286 1.18-1.868.728-.064 1.466-.098 2.21-.098zm-3.635.254c-.24.377-.48.763-.704 1.16-.225.39-.435.782-.635 1.174-.265-.656-.49-1.31-.676-1.947.64-.15 1.315-.283 2.015-.386zm7.26 0c.695.103 1.365.23 2.006.387-.18.632-.405 1.282-.66 1.933-.2-.39-.41-.783-.64-1.174-.225-.392-.465-.774-.705-1.146zm3.063.675c.484.15.944.317 1.375.498 1.732.74 2.852 1.708 2.852 2.476-.005.768-1.125 1.74-2.857 2.475-.42.18-.88.342-1.355.493-.28-.958-.646-1.956-1.1-2.98.45-1.017.81-2.01 1.085-2.964zm-13.395.004c.278.96.645 1.957 1.1 2.98-.45 1.017-.812 2.01-1.086 2.964-.484-.15-.944-.318-1.37-.5-1.732-.737-2.852-1.706-2.852-2.474 0-.768 1.12-1.742 2.852-2.476.42-.18.88-.342 1.356-.494zm11.678 4.28c.265.657.49 1.312.676 1.948-.64.157-1.316.29-2.016.39.24-.375.48-.762.705-1.158.225-.39.435-.788.636-1.18zm-9.945.02c.2.392.41.783.64 1.175.23.39.465.772.705 1.143-.695-.102-1.365-.23-2.006-.386.18-.63.406-1.282.66-1.933zM17.92 16.32c.112.493.2.968.254 1.423.23 1.868-.054 3.32-.714 3.708-.147.09-.338.128-.563.128-1.012 0-2.514-.807-4.11-2.28.686-.72 1.37-1.536 2.02-2.44 1.107-.118 2.154-.3 3.113-.54zm-11.83.01c.96.234 2.006.415 3.107.532.66.905 1.345 1.727 2.035 2.446-1.595 1.483-3.092 2.295-4.11 2.295-.22-.005-.406-.05-.553-.132-.666-.38-.955-1.834-.73-3.703.054-.46.142-.944.25-1.438zm4.56.64c.44.02.89.034 1.345.034.46 0 .915-.01 1.36-.034-.44.572-.895 1.095-1.345 1.565-.455-.47-.91-.993-1.36-1.565z"
-                  />
-                </svg>
-              </div>
-              <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
-                  Next.js and React
-                </h2>
-                <p className="mt-2 text-base text-gray-500">
-                  Leverage the power of modern web technologies for optimal
-                  performance and developer experience.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
-                <Database className="h-6 w-6" />
-              </div>
-              <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
-                  Postgres and Drizzle ORM
-                </h2>
-                <p className="mt-2 text-base text-gray-500">
-                  Robust database solution with an intuitive ORM for efficient
-                  data management and scalability.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
-                <CreditCard className="h-6 w-6" />
-              </div>
-              <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
-                  Stripe Integration
-                </h2>
-                <p className="mt-2 text-base text-gray-500">
-                  Seamless payment processing and subscription management with
-                  industry-leading Stripe integration.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-                Ready to launch your SaaS?
-              </h2>
-              <p className="mt-3 max-w-3xl text-lg text-gray-500">
-                Our template provides everything you need to get your SaaS up
-                and running quickly. Don't waste time on boilerplate - focus on
-                what makes your product unique.
-              </p>
-            </div>
-            <div className="mt-8 lg:mt-0 flex justify-center lg:justify-end">
-              <a href="https://github.com/nextjs/saas-starter" target="_blank">
+                  Get started — it's free
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="/dashboard">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg rounded-full"
+                  className="text-base rounded-full px-8 py-6 border-2 hover:bg-gray-50"
                 >
-                  View the code
-                  <ArrowRight className="ml-3 h-6 w-6" />
+                  <Search className="mr-2 h-5 w-5" />
+                  Try a search
                 </Button>
-              </a>
+              </Link>
+            </div>
+
+            <div className="fade-up-5 mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                No credit card required
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                Free forever for solo founders
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                GDPR compliant
+              </div>
             </div>
           </div>
+
+          <div className="lg:col-span-5">
+            <HeroSearchPreview />
+          </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
+  );
+}
+
+function HeroSearchPreview() {
+  return (
+    <div className="fade-up-3 relative">
+      <div className="absolute -inset-4 bg-gradient-to-br from-orange-400/30 via-rose-300/30 to-amber-400/30 rounded-3xl blur-2xl" />
+      <div className="relative rounded-3xl bg-white border border-gray-200 shadow-2xl p-6 overflow-hidden">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="h-3 w-3 rounded-full bg-red-400" />
+          <div className="h-3 w-3 rounded-full bg-amber-400" />
+          <div className="h-3 w-3 rounded-full bg-green-400" />
+          <div className="ml-3 text-xs text-gray-400 font-mono">
+            doesthiscompanyexist.com/dashboard
+          </div>
+        </div>
+
+        <div className="rounded-2xl border-2 border-orange-500/30 bg-orange-50/40 px-4 py-3 flex items-center gap-3">
+          <Search className="h-5 w-5 text-orange-500" />
+          <span className="font-mono text-base text-gray-800">
+            northwind coffee
+          </span>
+          <span className="ml-auto inline-block h-5 w-px bg-gray-400 animate-pulse" />
+        </div>
+
+        <div className="mt-4 space-y-3">
+          <ResultRow
+            name="Northwind Coffee Ltd"
+            number="14552981"
+            status="Active"
+            verdict="taken"
+          />
+          <ResultRow
+            name="Northwind Coffee Roasters Ltd"
+            number="08821044"
+            status="Dissolved"
+            verdict="reclaimable"
+          />
+          <ResultRow
+            name="Northwind Coffee House Ltd"
+            number="11220039"
+            status="Active"
+            verdict="taken"
+          />
+        </div>
+
+        <div className="mt-5 rounded-xl bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-200 p-4">
+          <div className="flex items-center gap-2 text-sm font-bold text-purple-900">
+            <Sparkles className="h-4 w-4" />
+            AI suggestions you could register today
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {[
+              'Northwind Roastworks',
+              'Borough Bean Co.',
+              'Compass Coffee Labs',
+              'Meridian Brew',
+            ].map(n => (
+              <span
+                key={n}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-purple-200 text-xs font-semibold text-purple-800"
+              >
+                <CheckCircle2 className="h-3 w-3 text-green-600" />
+                {n}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResultRow({
+  name,
+  number,
+  status,
+  verdict,
+}: {
+  name: string;
+  number: string;
+  status: string;
+  verdict: 'taken' | 'reclaimable';
+}) {
+  const isTaken = verdict === 'taken';
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2.5">
+      <div className="flex items-center gap-3 min-w-0">
+        <Building2 className="h-4 w-4 text-gray-400 flex-shrink-0" />
+        <div className="min-w-0">
+          <div className="text-sm font-semibold text-gray-900 truncate">
+            {name}
+          </div>
+          <div className="text-xs text-gray-500 font-mono">{number}</div>
+        </div>
+      </div>
+      <span
+        className={`px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${
+          isTaken
+            ? 'bg-red-50 text-red-700 border-red-200'
+            : 'bg-amber-50 text-amber-700 border-amber-200'
+        }`}
+      >
+        {status}
+      </span>
+    </div>
+  );
+}
+
+// ─── Trust bar / stats ───────────────────────────────────────────────────
+
+function TrustBar() {
+  const stats = [
+    { v: '5.6M+', l: 'UK companies checked against' },
+    { v: '< 800ms', l: 'Average search time' },
+    { v: '100%', l: 'Schedule 3 rule coverage' },
+    { v: '0', l: 'Cost to get started' },
+  ];
+  return (
+    <section className="border-y border-gray-100 bg-gray-50/80 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+        {stats.map(s => (
+          <div key={s.l} className="text-center reveal-on-scroll">
+            <div className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-br from-orange-500 to-rose-500 bg-clip-text text-transparent">
+              {s.v}
+            </div>
+            <div className="mt-1 text-sm text-gray-600">{s.l}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── Pain section ────────────────────────────────────────────────────────
+
+function PainSection() {
+  const pains = [
+    {
+      icon: PoundSterling,
+      title: 'You spent £50 for a rejection email',
+      body: 'Companies House charges £50 for online incorporation. If your name fails their "same as" check, the application is rejected and you start over — sometimes more than once.',
+    },
+    {
+      icon: Clock,
+      title: 'You wasted a week on a name you can\'t use',
+      body: 'You built the logo, bought the domain, told your friends. Then a near-duplicate registration you didn\'t know about blocks the whole thing.',
+    },
+    {
+      icon: AlertTriangle,
+      title: "The official checker won't help you brainstorm",
+      body: "Companies House tells you yes-or-no for one name at a time. It won't suggest alternatives, surface dissolved-name clashes, or explain why your idea failed.",
+    },
+  ];
+  return (
+    <section className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto reveal-on-scroll">
+          <span className="inline-block text-sm font-bold uppercase tracking-wider text-orange-600">
+            The problem
+          </span>
+          <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+            Picking a UK company name shouldn't be a guessing game.
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Every year thousands of founders waste time and money discovering — at
+            the worst possible moment — that the name they fell in love with is
+            blocked under Companies House{' '}
+            <strong className="text-gray-900">"same as"</strong> rules.
+          </p>
+        </div>
+
+        <div className="mt-16 grid md:grid-cols-3 gap-6">
+          {pains.map(({ icon: Icon, title, body }) => (
+            <div
+              key={title}
+              className="reveal-on-scroll group relative rounded-2xl border border-gray-200 bg-white p-7 hover:border-orange-200 hover:shadow-xl hover:-translate-y-1 transition-all"
+            >
+              <div className="h-12 w-12 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Icon className="h-6 w-6 text-red-500" />
+              </div>
+              <h3 className="mt-5 text-xl font-bold text-gray-900">{title}</h3>
+              <p className="mt-2 text-gray-600 leading-relaxed">{body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Features ────────────────────────────────────────────────────────────
+
+function FeaturesSection() {
+  const features = [
+    {
+      icon: ShieldCheck,
+      title: 'Schedule 3 rules, faithfully implemented',
+      body: 'Accent folding, & ↔ and, numeral ↔ word equivalents, disregarded suffixes, plural collapsing, the 60-character cap — all the same rules Companies House applies, end to end.',
+      tone: 'orange',
+    },
+    {
+      icon: Database,
+      title: 'Live Companies House data',
+      body: 'We hit the official Advanced Search and Basic Search APIs in real time, including dissolved, in-liquidation, in-administration and removed companies that the public search hides.',
+      tone: 'blue',
+    },
+    {
+      icon: Bot,
+      title: 'AI name brainstormer',
+      body: 'Describe your business in plain English. Gemini-powered suggestions are tuned to avoid the disregarded fillers that weaken distinctiveness — and we batch-check availability for you.',
+      tone: 'purple',
+    },
+    {
+      icon: Zap,
+      title: 'Built for speed',
+      body: 'Sub-second searches, parallel multi-name checks, and one-click links straight to the official Companies House record for every match.',
+      tone: 'amber',
+    },
+    {
+      icon: FileText,
+      title: 'Honest verdicts',
+      body: 'Big green YES when the name is yours to take. Big red NO when it\'s blocked. Amber "you may still be able to register this" for dissolved-name edge cases. No jargon.',
+      tone: 'green',
+    },
+    {
+      icon: Gauge,
+      title: 'One click to register',
+      body: "When the name's free, we link you straight through to the Companies House registration flow with the name in hand. No re-typing, no re-searching.",
+      tone: 'rose',
+    },
+  ];
+
+  const tone: Record<string, string> = {
+    orange: 'bg-orange-50 text-orange-600 border-orange-100',
+    blue: 'bg-blue-50 text-blue-600 border-blue-100',
+    purple: 'bg-purple-50 text-purple-600 border-purple-100',
+    amber: 'bg-amber-50 text-amber-600 border-amber-100',
+    green: 'bg-green-50 text-green-600 border-green-100',
+    rose: 'bg-rose-50 text-rose-600 border-rose-100',
+  };
+
+  return (
+    <section className="py-24 bg-gray-50/60">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto reveal-on-scroll">
+          <span className="inline-block text-sm font-bold uppercase tracking-wider text-orange-600">
+            What you get
+          </span>
+          <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+            Everything you need to lock in the right name.
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Built on the same rules Companies House uses. Designed for founders
+            who'd rather ship a company than read regulations.
+          </p>
+        </div>
+
+        <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map(({ icon: Icon, title, body, tone: t }) => (
+            <div
+              key={title}
+              className="reveal-on-scroll group rounded-2xl bg-white border border-gray-200 p-7 hover:shadow-xl hover:-translate-y-1 hover:border-gray-300 transition-all"
+            >
+              <div
+                className={`h-12 w-12 rounded-xl border flex items-center justify-center group-hover:scale-110 transition-transform ${tone[t]}`}
+              >
+                <Icon className="h-6 w-6" />
+              </div>
+              <h3 className="mt-5 text-lg font-bold text-gray-900">{title}</h3>
+              <p className="mt-2 text-gray-600 leading-relaxed">{body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── How it works ────────────────────────────────────────────────────────
+
+function HowItWorks() {
+  const steps = [
+    {
+      n: '01',
+      title: 'Type a name or describe your business',
+      body: 'Search a specific name you have in mind, or describe what you do and let our AI generate ten distinctive candidates.',
+    },
+    {
+      n: '02',
+      title: "We check it against every UK company on the register",
+      body: "Live Companies House data, deduplicated across the basic and advanced search endpoints, normalised with the official Schedule 3 same-as ruleset.",
+    },
+    {
+      n: '03',
+      title: 'You get a clear verdict — and a path forward',
+      body: "Green: register it. Red: see exactly which companies block it, plus AI alternatives that are actually free. Amber: dissolved match — may still be claimable.",
+    },
+  ];
+  return (
+    <section className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto reveal-on-scroll">
+          <span className="inline-block text-sm font-bold uppercase tracking-wider text-orange-600">
+            How it works
+          </span>
+          <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+            Three steps, under a minute.
+          </h2>
+        </div>
+
+        <div className="mt-16 grid md:grid-cols-3 gap-8 relative">
+          <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-orange-300 to-transparent" />
+          {steps.map(s => (
+            <div key={s.n} className="reveal-on-scroll relative text-center">
+              <div className="relative mx-auto h-24 w-24 rounded-full bg-white border-2 border-orange-200 shadow-lg flex items-center justify-center">
+                <span className="text-2xl font-extrabold bg-gradient-to-br from-orange-500 to-rose-500 bg-clip-text text-transparent">
+                  {s.n}
+                </span>
+              </div>
+              <h3 className="mt-6 text-xl font-bold text-gray-900">{s.title}</h3>
+              <p className="mt-2 text-gray-600 leading-relaxed">{s.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Comparison ──────────────────────────────────────────────────────────
+
+function ComparisonSection() {
+  const rows: Array<{ feature: string; us: boolean | string; them: boolean | string }> = [
+    { feature: 'Searches the live Companies House register', us: true, them: true },
+    { feature: 'Applies official Schedule 3 "same as" rules', us: true, them: true },
+    { feature: 'Surfaces dissolved-name clashes', us: true, them: 'Sometimes' },
+    { feature: 'Bulk-checks a shortlist in one click', us: true, them: false },
+    { feature: 'AI brainstorms registrable alternatives', us: true, them: false },
+    { feature: 'Plain-English verdict (not a registry page)', us: true, them: false },
+    { feature: 'Links straight to registration when free', us: true, them: 'Manual' },
+    { feature: 'Free for solo founders', us: true, them: true },
+  ];
+  return (
+    <section className="py-24 bg-gradient-to-b from-white to-gray-50">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto reveal-on-scroll">
+          <span className="inline-block text-sm font-bold uppercase tracking-wider text-orange-600">
+            Comparison
+          </span>
+          <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+            Why not just use the official tool?
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            You should — for the final pre-incorporation check. But the official
+            tool isn't built for the messy, exploratory part of naming a company.
+            That's where we come in.
+          </p>
+        </div>
+
+        <div className="reveal-on-scroll mt-12 rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+          <div className="grid grid-cols-[1fr_auto_auto] divide-x divide-gray-200">
+            <div className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-50">
+              Capability
+            </div>
+            <div className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 text-center min-w-[140px]">
+              DoesThisCompanyExist
+            </div>
+            <div className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-50 text-center min-w-[140px]">
+              Official checker
+            </div>
+            {rows.map(r => (
+              <ComparisonRow key={r.feature} {...r} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ComparisonRow({
+  feature,
+  us,
+  them,
+}: {
+  feature: string;
+  us: boolean | string;
+  them: boolean | string;
+}) {
+  const cell = (v: boolean | string, primary = false) => {
+    if (v === true) {
+      return (
+        <CheckCircle2
+          className={`h-5 w-5 mx-auto ${primary ? 'text-orange-600' : 'text-green-600'}`}
+        />
+      );
+    }
+    if (v === false) {
+      return <XCircle className="h-5 w-5 mx-auto text-gray-300" />;
+    }
+    return (
+      <span className="text-xs font-medium text-gray-500">{v}</span>
+    );
+  };
+  return (
+    <>
+      <div className="px-6 py-4 text-sm text-gray-700 border-t border-gray-100">
+        {feature}
+      </div>
+      <div className="px-6 py-4 text-center border-t border-gray-100 bg-orange-50/30">
+        {cell(us, true)}
+      </div>
+      <div className="px-6 py-4 text-center border-t border-gray-100">
+        {cell(them)}
+      </div>
+    </>
+  );
+}
+
+// ─── Demo teaser ─────────────────────────────────────────────────────────
+
+function DemoTeaser() {
+  return (
+    <section className="py-24 bg-gray-900 relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute top-10 left-10 h-72 w-72 rounded-full bg-orange-600/20 blur-3xl animate-blob" />
+        <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-rose-600/20 blur-3xl animate-blob-slow" />
+      </div>
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="reveal-on-scroll">
+          <span className="inline-block text-sm font-bold uppercase tracking-wider text-orange-400">
+            See it in action
+          </span>
+          <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+            Type a name. Get an answer. Move on with your day.
+          </h2>
+          <p className="mt-4 text-lg text-gray-300 max-w-2xl mx-auto">
+            No account needed to try it. Bring a name, get a verdict in under a
+            second, and link straight to Companies House if the name is yours.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/dashboard">
+              <Button
+                size="lg"
+                className="text-base rounded-full bg-white text-gray-900 hover:bg-gray-100 px-8 py-6"
+              >
+                <Search className="mr-2 h-5 w-5" />
+                Try a search now
+              </Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-base rounded-full px-8 py-6 border-2 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              >
+                Sign up for free
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── FAQ ─────────────────────────────────────────────────────────────────
+
+function FAQSection() {
+  return (
+    <section id="faq" className="py-24 bg-white">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center reveal-on-scroll">
+          <span className="inline-block text-sm font-bold uppercase tracking-wider text-orange-600">
+            FAQ
+          </span>
+          <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+            Questions, answered.
+          </h2>
+        </div>
+
+        <div className="mt-12 space-y-3">
+          {FAQ_ITEMS.map(({ q, a }) => (
+            <details
+              key={q}
+              className="reveal-on-scroll group rounded-2xl border border-gray-200 bg-white px-6 py-5 open:shadow-md transition-shadow"
+            >
+              <summary className="flex items-center justify-between cursor-pointer list-none">
+                <h3 className="text-lg font-bold text-gray-900 pr-4">{q}</h3>
+                <ChevronDown className="h-5 w-5 text-gray-400 flex-shrink-0 transition-transform group-open:rotate-180" />
+              </summary>
+              <p className="mt-4 text-gray-600 leading-relaxed">{a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Final CTA ───────────────────────────────────────────────────────────
+
+function FinalCTA() {
+  return (
+    <section className="py-24 bg-gradient-to-br from-orange-50 via-rose-50 to-amber-50 relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute top-0 left-1/4 h-80 w-80 rounded-full bg-orange-300/40 blur-3xl animate-blob" />
+        <div className="absolute bottom-0 right-1/4 h-80 w-80 rounded-full bg-rose-300/40 blur-3xl animate-blob-slow" />
+      </div>
+      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-gray-900 reveal-on-scroll">
+          Stop guessing. Start incorporating.
+        </h2>
+        <p className="mt-6 text-xl text-gray-700 max-w-2xl mx-auto reveal-on-scroll">
+          Create your free account and check unlimited names against the live UK
+          register. Lock in the right name today and skip the £50 rejection
+          email tomorrow.
+        </p>
+        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center reveal-on-scroll">
+          <Link href="/sign-up">
+            <Button
+              size="lg"
+              className="text-base rounded-full bg-gray-900 hover:bg-gray-800 text-white px-10 py-6 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all"
+            >
+              Get started — free forever
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+          <Link href="/pricing">
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-base rounded-full px-10 py-6 border-2 border-gray-300 bg-white hover:bg-gray-50"
+            >
+              See pricing
+            </Button>
+          </Link>
+        </div>
+        <p className="mt-6 text-sm text-gray-500">
+          No credit card. Cancel any time. Built by founders who got the £50
+          rejection email so you don't have to.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────
+
+function Footer() {
+  return (
+    <footer className="bg-gray-900 text-gray-400 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-4 gap-8">
+        <div className="md:col-span-2">
+          <div className="text-xl font-semibold text-white">
+            DoesThisCompanyExist.com
+          </div>
+          <p className="mt-3 text-sm leading-relaxed max-w-md">
+            The UK company name availability checker built on the official
+            Companies House Schedule 3 same-as ruleset. Independent — not
+            affiliated with Companies House or HM Government.
+          </p>
+        </div>
+        <div>
+          <div className="text-sm font-bold text-white uppercase tracking-wider">
+            Product
+          </div>
+          <ul className="mt-3 space-y-2 text-sm">
+            <li>
+              <Link href="/dashboard" className="hover:text-white">
+                Search names
+              </Link>
+            </li>
+            <li>
+              <Link href="/pricing" className="hover:text-white">
+                Pricing
+              </Link>
+            </li>
+            <li>
+              <Link href="/sign-up" className="hover:text-white">
+                Sign up
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <div className="text-sm font-bold text-white uppercase tracking-wider">
+            Resources
+          </div>
+          <ul className="mt-3 space-y-2 text-sm">
+            <li>
+              <a href="#faq" className="hover:text-white">
+                FAQ
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://www.legislation.gov.uk/uksi/2015/17/schedule/3"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white"
+              >
+                Schedule 3 regulations
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://find-and-update.company-information.service.gov.uk/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white"
+              >
+                Companies House
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div className="mt-10 border-t border-white/10 pt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs text-gray-500">
+        © {new Date().getFullYear()} DoesThisCompanyExist.com. All rights
+        reserved.
+      </div>
+    </footer>
   );
 }
