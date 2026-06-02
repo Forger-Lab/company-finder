@@ -7,9 +7,12 @@ import {
   updateTeamSubscription
 } from '@/lib/db/queries';
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil'
-});
+// Intentionally omit `apiVersion` — the Stripe SDK pins its own default
+// matching its bundled types (`Stripe.LatestApiVersion`). Hard-coding a
+// string literal here caused build failures whenever local and CI ended
+// up with different SDK minors. Letting the SDK self-pin keeps both
+// environments green and is the supported pattern.
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function createCheckoutSession({
   team,
