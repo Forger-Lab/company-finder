@@ -83,14 +83,48 @@ window.silktideConsentManager.init({
         { url: "https://www.googletagmanager.com/gtag/js?id=G-T2BBXDFNV4", load: "async" }
       ],
       onAccept: function() {
-        window.dataLayer = window.dataLayer || [];
-        // Expose gtag globally so app code can call trackEvent() and
-        // have those events flow to GA. Without this assignment the
-        // gtag function is local to this callback and events fired
-        // from React components silently no-op.
-        window.gtag = function() { window.dataLayer.push(arguments); };
-        window.gtag('js', new Date());
-        window.gtag('config', 'G-T2BBXDFNV4');
+        try {
+          window.dataLayer = window.dataLayer || [];
+          // Expose gtag globally so app code (trackEvent helper, etc.)
+          // can dispatch events. Without this the gtag function would
+          // be local to this callback.
+          if (typeof window.gtag !== 'function') {
+            window.gtag = function() { window.dataLayer.push(arguments); };
+          }
+
+          // Belt-and-braces: explicitly inject gtag.js in case
+          // Silktide's "scripts" array didn't (silent failures here
+          // are the most common reason a GA4 stream stays "Not
+          // active"). The ?id= query string makes gtag.js auto-init
+          // the property as soon as it loads.
+          if (!document.querySelector('script[data-ga-loader="true"]')) {
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=G-T2BBXDFNV4';
+            s.setAttribute('data-ga-loader', 'true');
+            document.head.appendChild(s);
+          }
+
+          window.gtag('js', new Date());
+          window.gtag('config', 'G-T2BBXDFNV4', {
+            send_page_view: true,
+            // Match the URL the user actually sees, even on SPA navs.
+            page_location: window.location.href,
+            page_path: window.location.pathname,
+            page_title: document.title
+          });
+          // Manual page_view in case the auto one was dropped by a
+          // race between gtag.js loading and the config call.
+          window.gtag('event', 'page_view', {
+            page_location: window.location.href,
+            page_path: window.location.pathname,
+            page_title: document.title
+          });
+
+          console.info('[GA] analytics consent accepted, gtag bootstrapped');
+        } catch (e) {
+          console.error('[GA] bootstrap failed', e);
+        }
       }
     },
     {
