@@ -9,7 +9,58 @@ import { SWRConfig } from 'swr';
 // (strategy="afterInteractive"). The library exposes
 // window.silktideConsentManager; the analytics consent entry will inject
 // the GA4 tag on accept, so we don't load gtag.js unconditionally.
+//
+// We also inject a small <style> block before init() so the banner uses
+// the site's orange/white palette instead of Silktide's default yellow/
+// black. Silktide v2 exposes its colours as CSS custom properties on
+// `#stcm-wrapper`, so a handful of variable overrides theme the entire
+// banner, modal, and floating icon.
 const SILKTIDE_INIT = `
+(function () {
+  var style = document.createElement('style');
+  style.id = 'silktide-theme-overrides';
+  style.textContent = [
+    '#stcm-wrapper {',
+    '  --primaryColor: #f97316;',                /* orange-500 — buttons + accents */
+    '  --backgroundColor: #ffffff;',             /* card / banner background */
+    '  --textColor: #111827;',                   /* gray-900 — body copy */
+    '  --iconColor: #ffffff;',                   /* floating icon foreground */
+    '  --iconBackgroundColor: #f97316;',         /* floating icon background */
+    '  --backdropBackgroundColor: rgba(249,115,22,0.55);', /* orange-500 scrim */
+    '  --backdropBackgroundBlur: 4px;',
+    '  --boxShadow: 0 10px 30px rgba(17,24,39,0.18), 0 2px 8px rgba(17,24,39,0.08);',
+    '  --fontFamily: Manrope, ui-sans-serif, system-ui, -apple-system, sans-serif;',
+    '}',
+    /* Primary button: orange fill, white text on hover-invert. */
+    '#stcm-wrapper .stcm-button-primary {',
+    '  color: #ffffff;',
+    '  background-color: #f97316;',
+    '  border: 2px solid #f97316;',
+    '  border-radius: 9999px;',
+    '}',
+    '#stcm-wrapper .stcm-button-primary:hover {',
+    '  background-color: #ea580c;',              /* orange-600 */
+    '  border-color: #ea580c;',
+    '  color: #ffffff;',
+    '}',
+    /* Secondary button: outline, orange text on white. */
+    '#stcm-wrapper .stcm-button-secondary {',
+    '  background-color: #ffffff;',
+    '  color: #f97316;',
+    '  border: 2px solid #f97316;',
+    '  border-radius: 9999px;',
+    '}',
+    '#stcm-wrapper .stcm-button-secondary:hover {',
+    '  background-color: #fff7ed;',              /* orange-50 */
+    '  color: #ea580c;',
+    '}',
+    /* Inline links should stay readable on the white card. */
+    '#stcm-wrapper a { color: #f97316; }',
+    '#stcm-wrapper a:hover { color: #ea580c; }'
+  ].join('\\n');
+  document.head.appendChild(style);
+})();
+
 window.silktideConsentManager.init({
   backdrop: { show: true },
   icon: { position: "bottomRight" },
@@ -141,12 +192,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      // Browser extensions (Liner, "be", Grammarly, etc.) often inject
+      // data-* attributes on <html>/<body> after the server-rendered
+      // HTML arrives. Suppress React's hydration warning for those two
+      // nodes only — the rest of the tree is still strictly hydrated.
+      suppressHydrationWarning
       className={`bg-white dark:bg-gray-950 text-black dark:text-white ${manrope.className}`}
     >
       <head>
-        {/* Silktide cookie consent — stylesheet + preconnect. React 19
-            hoists these into <head>; placing them here keeps the
-            intent explicit and avoids a flash of unstyled banner. */}
+        {/* Silktide cookie consent — stylesheet + preconnect. */}
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         <link
           rel="stylesheet"
@@ -155,17 +209,21 @@ export default function RootLayout({
           integrity="sha384-IO1E/jCrQXyH5rwcI0SXP7OXw47JFqQNDQcKhbFvqnL2IunBxxwE2Ne5XyAmCqKs"
           crossOrigin="anonymous"
         />
-      </head>
-      <body className="min-h-[100dvh] bg-gray-50">
-        {/* Silktide consent-manager library, loaded once for the whole
-            site. afterInteractive runs after hydration but before the
-            page is idle — banner appears very quickly on first paint. */}
+
+        {/* Silktide consent-manager library. `beforeInteractive` forces
+            it to load and execute before hydration, which guarantees
+            `window.silktideConsentManager` exists by the time the
+            `afterInteractive` init script runs below. With two
+            `afterInteractive` scripts there is no ordering guarantee
+            and the banner can silently fail to mount. */}
         <Script
           src="https://cdn.jsdelivr.net/gh/silktide/consent-manager@v2.0.0/silktide-consent-manager.js"
           integrity="sha384-j4NIMOecmtzMWe9GJADIIe5hTlHG63aiTQ/2XorW10RNyQJg+IU+xwFVDy45wBah"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         />
+      </head>
+      <body suppressHydrationWarning className="min-h-[100dvh] bg-gray-50">
         <Script
           id="silktide-consent-init"
           strategy="afterInteractive"
