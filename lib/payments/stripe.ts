@@ -7,12 +7,39 @@ import {
   updateTeamSubscription
 } from '@/lib/db/queries';
 
-// Intentionally omit `apiVersion` — the Stripe SDK pins its own default
-// matching its bundled types (`Stripe.LatestApiVersion`). Hard-coding a
-// string literal here caused build failures whenever local and CI ended
-// up with different SDK minors. Letting the SDK self-pin keeps both
-// environments green and is the supported pattern.
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+// Lazy Stripe client.
+//
+// `new Stripe(...)` throws synchronously if the key is missing, which used
+// to blow up `next build` on environments that haven't set
+// `STRIPE_SECRET_KEY` (Next imports every route module to collect page
+// data, even API routes). Deferring construction until the first call
+// keeps the build green on key-less environments and still fails loudly
+// at request time if the key is genuinely missing.
+//
+// `apiVersion` is intentionally not pinned — the SDK self-selects its
+// bundled `LatestApiVersion`, so local and CI never disagree on the type
+// literal.
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (_stripe) return _stripe;
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error(
+      'STRIPE_SECRET_KEY is not set — billing routes are unavailable.',
+    );
+  }
+  _stripe = new Stripe(key);
+  return _stripe;
+}
+
+// Proxy that defers construction until any property is accessed. Lets
+// existing call sites keep using `stripe.checkout.sessions.create(...)`
+// without changing every import.
+export const stripe = new Proxy({} as Stripe, {
+  get(_target, prop, receiver) {
+    return Reflect.get(getStripe(), prop, receiver);
+  },
+});
 
 export async function createCheckoutSession({
   team,
