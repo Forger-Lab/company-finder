@@ -33,9 +33,13 @@ window.silktideConsentManager.init({
       ],
       onAccept: function() {
         window.dataLayer = window.dataLayer || [];
-        function gtag() { window.dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-T2BBXDFNV4');
+        // Expose gtag globally so app code can call trackEvent() and
+        // have those events flow to GA. Without this assignment the
+        // gtag function is local to this callback and events fired
+        // from React components silently no-op.
+        window.gtag = function() { window.dataLayer.push(arguments); };
+        window.gtag('js', new Date());
+        window.gtag('config', 'G-T2BBXDFNV4');
       }
     },
     {

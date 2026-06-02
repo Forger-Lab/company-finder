@@ -3,14 +3,26 @@ import { Check } from 'lucide-react';
 import { getStripePrices, getStripeProducts } from '@/lib/payments/stripe';
 import { SubmitButton } from './submit-button';
 
-// Prices are fresh for one hour max
+// Render on demand instead of prerendering at build time — we don't
+// want the build to depend on a live Stripe key being valid (it isn't
+// in CI / fresh dev environments), and prices change rarely enough
+// that lazy fetching with a short revalidate is fine.
+export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 export default async function PricingPage() {
-  const [prices, products] = await Promise.all([
-    getStripePrices(),
-    getStripeProducts(),
-  ]);
+  let prices: Awaited<ReturnType<typeof getStripePrices>> = [];
+  let products: Awaited<ReturnType<typeof getStripeProducts>> = [];
+  try {
+    [prices, products] = await Promise.all([
+      getStripePrices(),
+      getStripeProducts(),
+    ]);
+  } catch (err) {
+    console.error('Stripe price/product fetch failed:', err);
+    // Fall through with empty arrays — UI will render its default
+    // plan names and "Get Started" buttons so the page still loads.
+  }
 
   const basePlan = products.find((product) => product.name === 'Base');
   const plusPlan = products.find((product) => product.name === 'Plus');

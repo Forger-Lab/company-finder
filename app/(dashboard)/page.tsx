@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { TrackedLink } from '@/components/tracked-link';
 import {
   ArrowRight,
   ShieldCheck,
@@ -150,7 +151,7 @@ function Hero() {
             </p>
 
             <div className="fade-up-4 mt-8 flex flex-col sm:flex-row gap-3">
-              <Link href="/sign-up">
+              <TrackedLink href="/sign-up" cta="hero_signup">
                 <Button
                   size="lg"
                   className="text-base rounded-full bg-orange-500 hover:bg-orange-600 px-8 py-6 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-all hover:-translate-y-0.5"
@@ -158,8 +159,8 @@ function Hero() {
                   Get started — it's free
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-              </Link>
-              <Link href="/dashboard">
+              </TrackedLink>
+              <TrackedLink href="/dashboard" cta="hero_try_search">
                 <Button
                   size="lg"
                   variant="outline"
@@ -168,7 +169,7 @@ function Hero() {
                   <Search className="mr-2 h-5 w-5" />
                   Try a search
                 </Button>
-              </Link>
+              </TrackedLink>
             </div>
 
             <div className="fade-up-5 mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500">
@@ -637,7 +638,7 @@ function DemoTeaser() {
             second, and link straight to Companies House if the name is yours.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/dashboard">
+            <TrackedLink href="/dashboard" cta="demo_try_search">
               <Button
                 size="lg"
                 className="text-base rounded-full bg-white text-gray-900 hover:bg-gray-100 px-8 py-6"
@@ -645,8 +646,8 @@ function DemoTeaser() {
                 <Search className="mr-2 h-5 w-5" />
                 Try a search now
               </Button>
-            </Link>
-            <Link href="/sign-up">
+            </TrackedLink>
+            <TrackedLink href="/sign-up" cta="demo_signup">
               <Button
                 size="lg"
                 variant="outline"
@@ -655,7 +656,7 @@ function DemoTeaser() {
                 Sign up for free
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-            </Link>
+            </TrackedLink>
           </div>
         </div>
       </div>
@@ -716,7 +717,7 @@ function FinalCTA() {
           Companies House.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center reveal-on-scroll">
-          <Link href="/sign-up">
+          <TrackedLink href="/sign-up" cta="final_cta_signup">
             <Button
               size="lg"
               className="text-base rounded-full bg-gray-900 hover:bg-gray-800 text-white px-10 py-6 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all"
@@ -724,8 +725,8 @@ function FinalCTA() {
               Get started — free forever
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-          </Link>
-          <Link href="/dashboard">
+          </TrackedLink>
+          <TrackedLink href="/dashboard" cta="final_cta_try_search">
             <Button
               size="lg"
               variant="outline"
@@ -734,7 +735,7 @@ function FinalCTA() {
               <Search className="mr-2 h-5 w-5" />
               Try a search first
             </Button>
-          </Link>
+          </TrackedLink>
         </div>
         <p className="mt-6 text-sm text-gray-500">
           No credit card. Cancel any time. Built by founders who picked the

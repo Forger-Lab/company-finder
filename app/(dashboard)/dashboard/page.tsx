@@ -15,6 +15,7 @@ import {
   Wand2,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { trackEvent } from '@/lib/analytics';
 
 interface Company {
   id: string;
@@ -145,12 +146,22 @@ function KnowNameTab() {
 
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!query.trim()) return;
+    const term = query.trim();
+    if (!term) return;
     setIsLoading(true);
     setHasSearched(true);
-    setSearchedFor(query.trim());
+    setSearchedFor(term);
+    trackEvent('search_name', { search_term: term, mode: 'direct' });
     try {
-      setResults(await checkName(query));
+      const r = await checkName(query);
+      setResults(r);
+      const blocking = r.filter(c => !isReclaimable(c.companyStatus));
+      trackEvent('name_check_result', {
+        search_term: term,
+        verdict: blocking.length === 0 ? 'available' : 'taken',
+        match_count: r.length,
+        blocking_count: blocking.length,
+      });
     } catch (err) {
       console.error('Search failed:', err);
       setResults([]);
@@ -201,8 +212,19 @@ function KnowNameTab() {
               setHasSearched(true);
               setSearchedFor(tag);
               setIsLoading(true);
+              trackEvent('search_suggestion_tile', { tag });
+              trackEvent('search_name', { search_term: tag, mode: 'suggestion_tile' });
               checkName(tag)
-                .then(setResults)
+                .then(r => {
+                  setResults(r);
+                  const blocking = r.filter(c => !isReclaimable(c.companyStatus));
+                  trackEvent('name_check_result', {
+                    search_term: tag,
+                    verdict: blocking.length === 0 ? 'available' : 'taken',
+                    match_count: r.length,
+                    blocking_count: blocking.length,
+                  });
+                })
                 .catch(() => setResults([]))
                 .finally(() => setIsLoading(false));
             }}
@@ -232,17 +254,19 @@ function DiscoverNameTab() {
 
   const handleGenerate = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!description.trim()) return;
+    const desc = description.trim();
+    if (!desc) return;
     setIsGenerating(true);
     setChecks(null);
     setSelected(new Set());
     setGenerateError(null);
     setGenerated([]);
+    trackEvent('generate_names', { description_length: desc.length });
     try {
       const res = await fetch('/api/generate-name', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description }),
+        body: JSON.stringify({ description: desc }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -255,6 +279,9 @@ function DiscoverNameTab() {
       setGenerated(names);
     } catch (err) {
       console.error('Generate failed:', err);
+      trackEvent('generate_names_error', {
+        reason: err instanceof Error ? err.message : 'unknown',
+      });
       setGenerateError(
         "Sorry, we've had an error generating names. Please try again in a moment.",
       );
@@ -266,8 +293,13 @@ function DiscoverNameTab() {
   const toggle = (name: string) => {
     setSelected(prev => {
       const next = new Set(prev);
-      if (next.has(name)) next.delete(name);
+      const wasSelected = next.has(name);
+      if (wasSelected) next.delete(name);
       else next.add(name);
+      trackEvent('select_generated_name', {
+        name,
+        action: wasSelected ? 'deselect' : 'select',
+      });
       return next;
     });
   };
@@ -277,19 +309,26 @@ function DiscoverNameTab() {
     if (names.length === 0) return;
     setIsChecking(true);
     setChecks(names.map(name => ({ name, status: 'pending' })));
+    trackEvent('bulk_check_names', { count: names.length, names });
     const settled = await Promise.allSettled(names.map(checkName));
-    setChecks(
-      names.map((name, i) => {
-        const r = settled[i];
-        if (r.status === 'rejected') return { name, status: 'error' };
-        const blocking = r.value.filter(c => !isReclaimable(c.companyStatus));
-        return {
-          name,
-          status: blocking.length === 0 ? 'available' : 'taken',
-          results: r.value,
-        };
-      }),
-    );
+    const resolved = names.map((name, i) => {
+      const r = settled[i];
+      if (r.status === 'rejected') {
+        return { name, status: 'error' as const };
+      }
+      const blocking = r.value.filter(c => !isReclaimable(c.companyStatus));
+      const status: NameCheck['status'] =
+        blocking.length === 0 ? 'available' : 'taken';
+      trackEvent('name_check_result', {
+        search_term: name,
+        verdict: status,
+        match_count: r.value.length,
+        blocking_count: blocking.length,
+        mode: 'bulk',
+      });
+      return { name, status, results: r.value };
+    });
+    setChecks(resolved);
     setIsChecking(false);
   };
 
@@ -442,6 +481,12 @@ function NameCheckRow({ check }: { check: NameCheck }) {
                 href={CH_REGISTER_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() =>
+                  trackEvent('click_register_at_ch', {
+                    name: check.name,
+                    source: 'bulk_result_row',
+                  })
+                }
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-bold transition-colors"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
@@ -485,6 +530,13 @@ function NameCheckRow({ check }: { check: NameCheck }) {
                 href={chUrl(c.companyNumber)}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() =>
+                  trackEvent('click_view_on_ch', {
+                    company_number: c.companyNumber,
+                    company_name: c.name,
+                    source: 'bulk_result_row',
+                  })
+                }
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-gray-200 bg-white hover:bg-gray-100 text-xs font-medium text-gray-700"
               >
                 <ExternalLink className="h-3 w-3" />
@@ -563,6 +615,12 @@ function SearchResults({
                 href={CH_REGISTER_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() =>
+                  trackEvent('click_register_at_ch', {
+                    name: searchedFor,
+                    source: 'verdict_banner',
+                  })
+                }
                 className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-bold transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
@@ -586,6 +644,7 @@ function SearchResults({
                 type="button"
                 className="mt-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
                 onClick={() => {
+                  trackEvent('click_ai_alternatives', { name: searchedFor });
                   console.log('AI suggest matching names for', searchedFor);
                 }}
               >
@@ -666,6 +725,13 @@ function SearchResults({
                       href={chUrl(company.companyNumber)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() =>
+                        trackEvent('click_view_on_ch', {
+                          company_number: company.companyNumber,
+                          company_name: company.name,
+                          source: 'search_result_card',
+                        })
+                      }
                       className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors"
                     >
                       <ExternalLink className="h-4 w-4" />
