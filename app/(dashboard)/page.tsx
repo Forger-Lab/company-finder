@@ -70,8 +70,8 @@ const faqJsonLd = {
 const appJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: 'DoesThisCompanyExist.com',
-  url: 'https://doesthiscompanyexist.com',
+  name: 'CompanyNameCheck.uk',
+  url: 'https://companynamecheck.uk',
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Any',
   description:
@@ -133,25 +133,20 @@ function Hero() {
             </div>
 
             <h1 className="fade-up-2 mt-6 text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900 leading-[1.05]">
-              Don't pay{' '}
+              Brainstorm a company name{' '}
               <span className="relative inline-block">
                 <span className="bg-gradient-to-r from-orange-500 via-rose-500 to-amber-500 bg-clip-text text-transparent">
-                  £50
+                  you can actually register.
                 </span>
-              </span>{' '}
-              to find out
-              <br />
-              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                your company name is taken.
               </span>
             </h1>
 
             <p className="fade-up-3 mt-6 text-xl text-gray-600 max-w-xl leading-relaxed">
-              Check any UK company name against the live{' '}
-              <strong className="text-gray-900">Companies House</strong> register
-              in under a second — using the official Schedule 3 "same as" rules.
-              If it's taken, our AI brainstorms registrable alternatives on the
-              spot.
+              Describe what you do, and our AI generates ten distinctive UK
+              company names — each one checked live against{' '}
+              <strong className="text-gray-900">Companies House</strong> using
+              the official Schedule 3 "same as" rules. Pick a winner you know is
+              free to grab.
             </p>
 
             <div className="fade-up-4 mt-8 flex flex-col sm:flex-row gap-3">
@@ -211,7 +206,7 @@ function HeroSearchPreview() {
           <div className="h-3 w-3 rounded-full bg-amber-400" />
           <div className="h-3 w-3 rounded-full bg-green-400" />
           <div className="ml-3 text-xs text-gray-400 font-mono">
-            doesthiscompanyexist.com/dashboard
+            companynamecheck.uk/dashboard
           </div>
         </div>
 
@@ -337,19 +332,19 @@ function TrustBar() {
 function PainSection() {
   const pains = [
     {
-      icon: PoundSterling,
-      title: 'You spent £50 for a rejection email',
-      body: 'Companies House charges £50 for online incorporation. If your name fails their "same as" check, the application is rejected and you start over — sometimes more than once.',
-    },
-    {
-      icon: Clock,
-      title: 'You wasted a week on a name you can\'t use',
-      body: 'You built the logo, bought the domain, told your friends. Then a near-duplicate registration you didn\'t know about blocks the whole thing.',
+      icon: Sparkles,
+      title: 'The blank-page problem',
+      body: 'Coming up with a name you actually like is hard. Every shortlist starts strong and ends with you doodling synonyms of "venture" in a notebook at midnight.',
     },
     {
       icon: AlertTriangle,
-      title: "The official checker won't help you brainstorm",
-      body: "Companies House tells you yes-or-no for one name at a time. It won't suggest alternatives, surface dissolved-name clashes, or explain why your idea failed.",
+      title: 'Every name you love is already taken',
+      body: 'You finally pick one — and ten minutes later you discover a near-duplicate on the register. Back to the doodling. Companies House\'s own checker won\'t suggest anything new.',
+    },
+    {
+      icon: Clock,
+      title: 'Checking a shortlist one-by-one is painful',
+      body: 'The official tool is yes-or-no for a single name at a time. You paste, wait, paste the next, wait. Twenty candidates becomes an hour of clicking.',
     },
   ];
   return (
@@ -360,13 +355,15 @@ function PainSection() {
             The problem
           </span>
           <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-            Picking a UK company name shouldn't be a guessing game.
+            Naming a company is two problems, not one.
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            Every year thousands of founders waste time and money discovering — at
-            the worst possible moment — that the name they fell in love with is
-            blocked under Companies House{' '}
-            <strong className="text-gray-900">"same as"</strong> rules.
+            You have to <strong className="text-gray-900">come up</strong> with a
+            name that fits your business — and then{' '}
+            <strong className="text-gray-900">verify</strong> nobody else has
+            grabbed it under Companies House{' '}
+            <strong className="text-gray-900">"same as"</strong> rules. Most
+            tools only help with one. We do both, in the same flow.
           </p>
         </div>
 
@@ -448,11 +445,11 @@ function FeaturesSection() {
             What you get
           </span>
           <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-            Everything you need to lock in the right name.
+            Brainstorm and verify, in one flow.
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            Built on the same rules Companies House uses. Designed for founders
-            who'd rather ship a company than read regulations.
+            Generate ideas, shortlist your favourites, and find out which ones
+            you can actually grab — without leaving the page.
           </p>
         </div>
 
@@ -564,7 +561,7 @@ function ComparisonSection() {
               Capability
             </div>
             <div className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 text-center min-w-[140px]">
-              DoesThisCompanyExist
+              CompanyNameCheck
             </div>
             <div className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-50 text-center min-w-[140px]">
               Official checker
@@ -711,12 +708,12 @@ function FinalCTA() {
       </div>
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-gray-900 reveal-on-scroll">
-          Stop guessing. Start incorporating.
+          Your next company name is one prompt away.
         </h2>
         <p className="mt-6 text-xl text-gray-700 max-w-2xl mx-auto reveal-on-scroll">
-          Create your free account and check unlimited names against the live UK
-          register. Lock in the right name today and skip the £50 rejection
-          email tomorrow.
+          Sign up for free, describe your business, and walk away with a
+          shortlist of distinctive names you know are free to register at
+          Companies House.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center reveal-on-scroll">
           <Link href="/sign-up">
@@ -728,19 +725,20 @@ function FinalCTA() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
-          <Link href="/pricing">
+          <Link href="/dashboard">
             <Button
               size="lg"
               variant="outline"
               className="text-base rounded-full px-10 py-6 border-2 border-gray-300 bg-white hover:bg-gray-50"
             >
-              See pricing
+              <Search className="mr-2 h-5 w-5" />
+              Try a search first
             </Button>
           </Link>
         </div>
         <p className="mt-6 text-sm text-gray-500">
-          No credit card. Cancel any time. Built by founders who got the £50
-          rejection email so you don't have to.
+          No credit card. Cancel any time. Built by founders who picked the
+          wrong name once, so you don't have to.
         </p>
       </div>
     </section>
@@ -755,7 +753,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-4 gap-8">
         <div className="md:col-span-2">
           <div className="text-xl font-semibold text-white">
-            DoesThisCompanyExist.com
+            CompanyNameCheck.uk
           </div>
           <p className="mt-3 text-sm leading-relaxed max-w-md">
             The UK company name availability checker built on the official
@@ -774,13 +772,13 @@ function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/pricing" className="hover:text-white">
-                Pricing
+              <Link href="/sign-up" className="hover:text-white">
+                Sign up
               </Link>
             </li>
             <li>
-              <Link href="/sign-up" className="hover:text-white">
-                Sign up
+              <Link href="/sign-in" className="hover:text-white">
+                Sign in
               </Link>
             </li>
           </ul>
@@ -818,9 +816,27 @@ function Footer() {
           </ul>
         </div>
       </div>
-      <div className="mt-10 border-t border-white/10 pt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs text-gray-500">
-        © {new Date().getFullYear()} DoesThisCompanyExist.com. All rights
-        reserved.
+      <div className="mt-10 border-t border-white/10 pt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="text-xs text-gray-500">
+          © {new Date().getFullYear()} CompanyNameCheck.uk. All rights
+          reserved.
+        </div>
+        <a
+          href="https://www.solvolab.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors"
+        >
+          <span className="uppercase tracking-wider font-semibold">
+            Powered by
+          </span>
+          <img
+            src="https://www.solvolab.com/brandlogo/SolvoLabLogo-Cut.png"
+            alt="SolvoLab"
+            className="h-6 w-auto opacity-80 group-hover:opacity-100 transition-opacity"
+            loading="lazy"
+          />
+        </a>
       </div>
     </footer>
   );

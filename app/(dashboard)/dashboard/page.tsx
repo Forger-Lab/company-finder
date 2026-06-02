@@ -91,10 +91,11 @@ export default function DashboardPage() {
     <div className="max-w-4xl mx-auto space-y-8 py-12">
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
-          Find Your Perfect Company Name
+          Brainstorm and grab your company name.
         </h1>
         <p className="text-xl text-gray-500">
-          Check name availability with Companies House — or brainstorm something brand new.
+          Generate distinctive UK company name ideas and check live against
+          Companies House whether you can actually register them.
         </p>
       </div>
 

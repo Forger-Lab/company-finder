@@ -34,10 +34,10 @@ function UserMenu() {
     return (
       <>
         <Link
-          href="/pricing"
+          href="/sign-in"
           className="text-sm font-medium text-gray-700 hover:text-gray-900"
         >
-          Pricing
+          Sign in
         </Link>
         <Button asChild className="rounded-full">
           <Link href="/sign-up">Sign Up</Link>
@@ -111,7 +111,7 @@ function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <CircleIcon className="h-6 w-6 text-orange-500" />
-          <span className="ml-2 text-xl font-semibold text-gray-900">DoesThisCompanyExist.com</span>
+          <span className="ml-2 text-xl font-semibold text-gray-900">CompanyNameCheck.uk</span>
         </Link>
         <div className="flex items-center space-x-4">
           <Suspense fallback={<div className="h-9" />}>
@@ -123,11 +123,44 @@ function Header() {
   );
 }
 
+function PoweredBy() {
+  return (
+    <footer className="border-t border-gray-100 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between gap-4">
+        <div className="text-xs text-gray-400">
+          © {new Date().getFullYear()} CompanyNameCheck.uk
+        </div>
+        <a
+          href="https://www.solvolab.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-2 text-xs text-gray-500 hover:text-gray-900 transition-colors"
+        >
+          <span className="uppercase tracking-wider font-semibold">
+            Powered by
+          </span>
+          <img
+            src="https://www.solvolab.com/brandlogo/SolvoLabLogo-Cut.png"
+            alt="SolvoLab"
+            className="h-5 w-auto opacity-80 group-hover:opacity-100 transition-opacity"
+            loading="lazy"
+          />
+        </a>
+      </div>
+    </footer>
+  );
+}
+
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  // The landing page (`/`) has its own SolvoLab footer baked in, so we
+  // only render this one for dashboard / settings / pricing pages.
+  const showPoweredBy = pathname !== '/';
   return (
     <section className="flex flex-col min-h-screen">
       <Header />
-      {children}
+      <div className="flex-1">{children}</div>
+      {showPoweredBy && <PoweredBy />}
     </section>
   );
 }

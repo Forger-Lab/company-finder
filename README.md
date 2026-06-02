@@ -1,119 +1,130 @@
-# Next.js SaaS Starter
+# CompanyNameCheck.uk
 
-This is a starter template for building a SaaS application using **Next.js** with support for authentication, Stripe integration for payments, and a dashboard for logged-in users.
+The UK company-name availability checker built on the official Companies House
+**Schedule 3 "same as" rules**. Type a name (or describe your business) and find
+out in under a second whether it's free to register — without paying £50 for a
+rejected incorporation.
 
-**Demo: [https://next-saas-start.vercel.app/](https://next-saas-start.vercel.app/)**
+Powered by [SolvoLab](https://www.solvolab.com).
 
-## Features
+## What it does
 
-- Marketing landing page (`/`) with animated Terminal element
-- Pricing page (`/pricing`) which connects to Stripe Checkout
-- Dashboard pages with CRUD operations on users/teams
-- Basic RBAC with Owner and Member roles
-- Subscription management with Stripe Customer Portal
-- Email/password authentication with JWTs stored to cookies
-- Global middleware to protect logged-in routes
-- Local middleware to protect Server Actions or validate Zod schemas
-- Activity logging system for any user events
+- **Same-as engine** — implements Schedule 3 of the Company, LLP and Business
+  (Names and Trading Disclosures) Regulations 2015: disregarded suffixes, word
+  and symbol equivalents (`&` ↔ `and`, `4` ↔ `four`, `£` ↔ `pound`, …), accent
+  folding, plural collapsing, dotted abbreviations (`L.P.` → `LP`), and the
+  60-character cap.
+- **Live Companies House data** — hits both the Advanced Search and Basic Search
+  APIs in parallel, including dissolved and removed companies.
+- **AI name brainstormer** — Gemini-powered suggestions generated from a plain-
+  English business description, with built-in self-correction on malformed
+  responses.
+- **Batch availability** — bulk-check a shortlist in one click.
+- **Clear verdicts** — green for "register it", amber for "this match is
+  dissolved, may still be claimable", red for "taken".
+- **One-click registration** — links straight to the official Companies House
+  registration flow when a name is free.
 
-## Tech Stack
+## Tech stack
 
-- **Framework**: [Next.js](https://nextjs.org/)
-- **Database**: [Postgres](https://www.postgresql.org/)
-- **ORM**: [Drizzle](https://orm.drizzle.team/)
-- **Payments**: [Stripe](https://stripe.com/)
-- **UI Library**: [shadcn/ui](https://ui.shadcn.com/)
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router + Turbopack)
+- **UI**: [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
+- **Database**: [Postgres](https://www.postgresql.org/) with
+  [Drizzle ORM](https://orm.drizzle.team/)
+- **Payments**: [Stripe](https://stripe.com/) (subscriptions + Customer Portal)
+- **Auth**: Email/password with JWT session cookies
+- **AI**: Google Gemini (`gemini-2.5-flash`) for name generation
+- **Companies data**: Companies House public API
 
-## Getting Started
+## Getting started
 
 ```bash
-git clone https://github.com/nextjs/saas-starter
-cd saas-starter
+git clone <this-repo-url>
+cd companyfinder
 pnpm install
 ```
 
-## Running Locally
+You will need keys for:
 
-[Install](https://docs.stripe.com/stripe-cli) and log in to your Stripe account:
+- A **Postgres** instance (a local Docker one is set up for you by `db:setup`)
+- A **Companies House** API key — free, https://developer.company-information.service.gov.uk/
+- A **Google Gemini** API key — free tier available, https://ai.google.dev/
+- A **Stripe** account if you want to test billing locally
+
+## Running locally
+
+[Install](https://docs.stripe.com/stripe-cli) and log in to your Stripe
+account (only needed for payment flows):
 
 ```bash
 stripe login
 ```
 
-Use the included setup script to create your `.env` file:
+Bootstrap the local environment (creates `docker-compose.yml`, `.env`, and the
+Postgres container):
 
 ```bash
 pnpm db:setup
 ```
 
-Run the database migrations and seed the database with a default user and team:
+Add your Companies House and Gemini keys to `.env`:
+
+```env
+COMPANY_HOUSE_KEY=...
+GEMINI_API_KEY=...
+```
+
+Run migrations and seed the database:
 
 ```bash
 pnpm db:migrate
 pnpm db:seed
 ```
 
-This will create the following user and team:
+The seed creates a test user:
 
-- User: `test@test.com`
-- Password: `admin123`
+- email: `test@test.com`
+- password: `admin123`
 
-You can also create new users through the `/sign-up` route.
-
-Finally, run the Next.js development server:
+Start the dev server:
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the app in action.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can listen for Stripe webhooks locally through their CLI to handle subscription change events:
+## Testing payments
 
-```bash
-stripe listen --forward-to localhost:3000/api/stripe/webhook
-```
+Use Stripe's test card:
 
-## Testing Payments
+- Card: `4242 4242 4242 4242`
+- Expiration: any future date
+- CVC: any 3-digit number
 
-To test Stripe payments, use the following test card details:
+## Deploying
 
-- Card Number: `4242 4242 4242 4242`
-- Expiration: Any future date
-- CVC: Any 3-digit number
+Set the following environment variables on your host (Vercel works out of the
+box):
 
-## Going to Production
+- `BASE_URL` — your production URL
+- `POSTGRES_URL` — production Postgres connection string
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+- `AUTH_SECRET` — generate with `openssl rand -base64 32`
+- `COMPANY_HOUSE_KEY`
+- `GEMINI_API_KEY`
 
-When you're ready to deploy your SaaS application to production, follow these steps:
+For Stripe production webhooks, point them at
+`yourdomain.com/api/stripe/webhook` and configure the
+`checkout.session.completed` and `customer.subscription.updated` events.
 
-### Set up a production Stripe webhook
+## Independence
 
-1. Go to the Stripe Dashboard and create a new webhook for your production environment.
-2. Set the endpoint URL to your production API route (e.g., `https://yourdomain.com/api/stripe/webhook`).
-3. Select the events you want to listen for (e.g., `checkout.session.completed`, `customer.subscription.updated`).
+CompanyNameCheck.uk is **not** affiliated with Companies House or HM
+Government. We consume their public API and apply the published regulations
+locally; every result links back to the official record so you can verify it
+yourself.
 
-### Deploy to Vercel
+---
 
-1. Push your code to a GitHub repository.
-2. Connect your repository to [Vercel](https://vercel.com/) and deploy it.
-3. Follow the Vercel deployment process, which will guide you through setting up your project.
-
-### Add environment variables
-
-In your Vercel project settings (or during deployment), add all the necessary environment variables. Make sure to update the values for the production environment, including:
-
-1. `BASE_URL`: Set this to your production domain.
-2. `STRIPE_SECRET_KEY`: Use your Stripe secret key for the production environment.
-3. `STRIPE_WEBHOOK_SECRET`: Use the webhook secret from the production webhook you created in step 1.
-4. `POSTGRES_URL`: Set this to your production database URL.
-5. `AUTH_SECRET`: Set this to a random string. `openssl rand -base64 32` will generate one.
-
-## Other Templates
-
-While this template is intentionally minimal and to be used as a learning resource, there are other paid versions in the community which are more full-featured:
-
-- https://achromatic.dev
-- https://shipfa.st
-- https://makerkit.dev
-- https://zerotoshipped.com
-- https://turbostarter.dev
+Built and operated by **[SolvoLab](https://www.solvolab.com)**.
