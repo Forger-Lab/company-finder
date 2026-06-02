@@ -817,8 +817,8 @@ function Footer() {
           </ul>
         </div>
       </div>
-      <div className="mt-10 border-t border-white/10 pt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="text-xs text-gray-500">
+      <div className="mt-10 border-t border-white/10 pt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-3 items-center gap-4">
+        <div className="text-xs text-gray-500 text-center sm:text-left">
           © {new Date().getFullYear()} CompanyNameCheck.uk. All rights
           reserved.
         </div>
@@ -826,7 +826,7 @@ function Footer() {
           href="https://www.solvolab.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="group inline-flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors"
+          className="group inline-flex items-center justify-center gap-2 text-xs text-gray-400 hover:text-white transition-colors justify-self-center"
         >
           <span className="uppercase tracking-wider font-semibold">
             Powered by
@@ -838,6 +838,9 @@ function Footer() {
             loading="lazy"
           />
         </a>
+        {/* spacer to balance the 3-col grid so the SolvoLab badge stays
+            centered in the page rather than between two items */}
+        <div className="hidden sm:block" />
       </div>
     </footer>
   );
