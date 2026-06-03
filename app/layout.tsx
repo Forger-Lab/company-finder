@@ -161,39 +161,47 @@ window.silktideConsentManager.init({
 export const metadata: Metadata = {
   metadataBase: new URL('https://companynamecheck.uk'),
   title: {
-    default: 'CompanyNameCheck.uk — UK Company Name Availability Checker',
-    template: '%s · CompanyNameCheck.uk',
+    // Front-load the high-intent keyword phrase so it wins the tab
+    // title and SERP cuts cleanly.
+    default:
+      'UK Company Name Checker — Check Limited Company Name Availability | Company Name Check',
+    template: '%s | UK Company Name Check',
   },
   description:
-    'Instantly check if a UK company name is available to register with Companies House. Uses the official Schedule 3 "same as" rules, surfaces dissolved-name clashes, and generates AI-powered alternatives when your first pick is taken.',
+    'Free UK company name checker. Instantly see if your limited company name is available to register at Companies House — official Schedule 3 "same as" rules, dissolved-name clashes flagged, AI-generated alternatives when your first pick is taken.',
   keywords: [
     'UK company name checker',
-    'Companies House name availability',
-    'check company name availability UK',
+    'company name availability UK',
+    'check company name availability',
+    'Companies House name check',
     'register limited company name',
     'company name search UK',
     'same as name rules',
     'company name generator UK',
     'AI company name ideas',
     'incorporate limited company',
-    'company name finder',
+    'UK company name finder',
+    'free company name checker',
   ],
-  authors: [{ name: 'CompanyNameCheck.uk' }],
-  creator: 'CompanyNameCheck.uk',
+  authors: [{ name: 'Company Name Check' }],
+  creator: 'Company Name Check',
+  applicationName: 'UK Company Name Check',
   openGraph: {
     type: 'website',
     locale: 'en_GB',
     url: 'https://companynamecheck.uk',
-    siteName: 'CompanyNameCheck.uk',
-    title: 'UK Company Name Availability Checker — Companies House same-as rules, instantly',
+    siteName: 'UK Company Name Check',
+    title:
+      'UK Company Name Checker — Check Limited Company Name Availability',
     description:
-      'Find out in seconds if your dream UK company name is free to register. Powered by the official Companies House dataset and the Schedule 3 same-as ruleset.',
+      'Find out in seconds if your UK limited company name is free to register at Companies House. Official Schedule 3 same-as rules, dissolved-name clashes, AI alternatives.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'CompanyNameCheck.uk — UK Company Name Availability Checker',
+    title:
+      'UK Company Name Checker — Check Limited Company Name Availability',
     description:
-      'Find out if your UK company name is actually free — before you build a brand around one you can\'t use. Live Companies House data, official Schedule 3 rules.',
+      'Free UK company name availability checker. Live Companies House data, official Schedule 3 rules, AI-generated alternatives.',
   },
   alternates: {
     canonical: 'https://companynamecheck.uk',

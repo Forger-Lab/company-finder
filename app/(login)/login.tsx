@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CircleIcon, Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
 import { signIn, signUp } from './actions';
 import { ActionState } from '@/lib/auth/middleware';
 
@@ -21,10 +21,26 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
   );
 
   return (
-    <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <div className="relative min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      {/* Back-to-landing arrow, top-left. */}
+      <Link
+        href="/"
+        aria-label="Back to home"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full px-3 py-1.5 transition-colors"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back
+      </Link>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <CircleIcon className="h-12 w-12 text-orange-500" />
+          <img
+            src="/logo.png"
+            alt="UK Company Name Check"
+            width={64}
+            height={64}
+            className="h-16 w-16 object-contain"
+          />
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {mode === 'signin'

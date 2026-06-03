@@ -71,7 +71,8 @@ const faqJsonLd = {
 const appJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: 'CompanyNameCheck.uk',
+  name: 'UK Company Name Check',
+  alternateName: 'Company Name Check',
   url: 'https://companynamecheck.uk',
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Any',
@@ -156,7 +157,7 @@ function Hero() {
                   size="lg"
                   className="text-base rounded-full bg-orange-500 hover:bg-orange-600 px-8 py-6 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-all hover:-translate-y-0.5"
                 >
-                  Get started — it's free
+                  Free Sign Up
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </TrackedLink>
@@ -310,7 +311,7 @@ function TrustBar() {
     { v: '5.6M+', l: 'UK companies checked against' },
     { v: '< 800ms', l: 'Average search time' },
     { v: '100%', l: 'Schedule 3 rule coverage' },
-    { v: '0', l: 'Cost to get started' },
+    { v: '£0', l: 'Cost to get started' },
   ];
   return (
     <section className="border-y border-gray-100 bg-gray-50/80 py-10">
@@ -653,7 +654,7 @@ function DemoTeaser() {
                 variant="outline"
                 className="text-base rounded-full px-8 py-6 border-2 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white"
               >
-                Sign up for free
+                Free Sign Up
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </TrackedLink>
@@ -716,24 +717,14 @@ function FinalCTA() {
           shortlist of distinctive names you know are free to register at
           Companies House.
         </p>
-        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center reveal-on-scroll">
+        <div className="mt-8 flex justify-center reveal-on-scroll">
           <TrackedLink href="/sign-up" cta="final_cta_signup">
             <Button
               size="lg"
               className="text-base rounded-full bg-gray-900 hover:bg-gray-800 text-white px-10 py-6 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all"
             >
-              Get started — free forever
+              Free Sign Up
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </TrackedLink>
-          <TrackedLink href="/dashboard" cta="final_cta_try_search">
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-base rounded-full px-10 py-6 border-2 border-gray-300 bg-white hover:bg-gray-50"
-            >
-              <Search className="mr-2 h-5 w-5" />
-              Try a search first
             </Button>
           </TrackedLink>
         </div>
@@ -754,7 +745,10 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-4 gap-8">
         <div className="md:col-span-2">
           <div className="text-xl font-semibold text-white">
-            CompanyNameCheck.uk
+            UK Company Name Check
+          </div>
+          <div className="text-xs text-gray-500 mt-1 font-mono">
+            companynamecheck.uk
           </div>
           <p className="mt-3 text-sm leading-relaxed max-w-md">
             The UK company name availability checker built on the official
@@ -819,8 +813,8 @@ function Footer() {
       </div>
       <div className="mt-10 border-t border-white/10 pt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-3 items-center gap-4">
         <div className="text-xs text-gray-500 text-center sm:text-left">
-          © {new Date().getFullYear()} CompanyNameCheck.uk. All rights
-          reserved.
+          © {new Date().getFullYear()} UK Company Name Check
+          (companynamecheck.uk). All rights reserved.
         </div>
         <a
           href="https://www.solvolab.com"
